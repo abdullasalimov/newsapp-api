@@ -10,29 +10,52 @@ class CollectionSerializer(serializers.ModelSerializer):
 
 
 class TopicSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        "collection_pk": "collection_pk",
+    }
+
     class Meta:
         model = Topic
         fields = ["id", "title"]
         collection = CollectionSerializer()
 
+    def create(self, validated_data):
+        collection_id = self.context["collection_id"]
+        return Topic.objects.create(collection_id=collection_id, **validated_data)
+
 
 class ArticleSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        "collection_pk": "collection_pk",
+        "topic_pk": "topic_pk",
+    }
+
     class Meta:
         model = Article
         fields = [
             "id",
+            "collection",
+            "topic",
             "title",
             "description",
-            "topic",
-            "collection",
             "created_at",
-            "is_favourite",
-            "likes",
             "views",
+            "likes",
+            "is_favourite",
         ]
+
+    def create(self, validated_data):
+        topic_id = self.context["topic_id"]
+        return Article.objects.create(topic_id=topic_id, **validated_data)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    parent_lookup_kwargs = {
+        "collection_pk": "collection_pk",
+        "topic_pk": "topic_pk",
+        "new_pk": "new_pk",
+    }
+
     class Meta:
         model = Review
         fields = ["id", "date", "name", "description"]

@@ -17,19 +17,23 @@ class CollectionViewSet(ModelViewSet):
 
 
 class TopicViewSet(ModelViewSet):
-    queryset = Topic.objects.all()
     serializer_class = TopicSerializer
 
+    def get_queryset(self):
+        return Topic.objects.filter(collection_id=self.kwargs["collection_pk"])
+
     def get_serializer_context(self):
-        return {"request": self.request}
+        return {"collection_id": self.kwargs["collection_pk"]}
 
 
 class NewsViewSet(ModelViewSet):
-    queryset = Article.objects.all()
     serializer_class = ArticleSerializer
 
+    def get_queryset(self):
+        return Article.objects.filter(topic_id=self.kwargs["topic_pk"])
+
     def get_serializer_context(self):
-        return {"request": self.request}
+        return {"topic_id": self.kwargs["topic_pk"]}
 
     def retrieve(self, request, *args, **kwargs):
         obj = self.get_object()
