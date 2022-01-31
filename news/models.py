@@ -25,20 +25,26 @@ class Article(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_favourite = models.BooleanField(default=False)
-    likes = models.ManyToManyField(User, blank=True)
-    # seen_count
+    likes = models.ManyToManyField(User, blank=True, default=None, related_name="likes")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
+    views = models.IntegerField(default=0, null=True, blank=True)
 
+    @property
     def number_of_likes(self):
-        return self.likes.count()
+        return self.likes.all().count()
 
     def __str__(self):
         return self.title
 
 
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    value = models.CharField(max_length=10)
+
+
 class Review(models.Model):
-    article = models.ForeignKey(
-        Article, on_delete=models.CASCADE, related_name="reviews"
-    )
+    new = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="reviews")
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateField(auto_now_add=True)

@@ -31,7 +31,18 @@ class NewsViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {"request": self.request}
 
+    def retrieve(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.views = obj.views + 1
+        obj.save(update_fields=("views",))
+        return super().retrieve(request, *args, **kwargs)
+
 
 class ReviewViewSet(ModelViewSet):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(new_id=self.kwargs["new_pk"])
+
+    def get_serializer_context(self):
+        return {"new_id": self.kwargs["new_pk"]}

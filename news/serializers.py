@@ -28,10 +28,15 @@ class ArticleSerializer(serializers.ModelSerializer):
             "created_at",
             "is_favourite",
             "likes",
+            "views",
         ]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ["id", "date", "name", "description", "article"]
+        fields = ["id", "date", "name", "description"]
+
+    def create(self, validated_data):
+        new_id = self.context["new_id"]
+        return Review.objects.create(new_id=new_id, **validated_data)
