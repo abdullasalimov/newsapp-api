@@ -1,7 +1,13 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
 from . import views
 
+router = SimpleRouter()
+router.register("news", views.NewsViewSet)
+router.register("collections", views.CollectionViewSet)
+router.register("topics", views.TopicViewSet)
+
+
 urlpatterns = [
-    path("news/", views.news_list),
-    path("news/<int:id>/", views.news_detail),
+    path("", include(router.urls)),
 ]

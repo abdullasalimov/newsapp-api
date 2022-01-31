@@ -1,7 +1,5 @@
-from operator import mod
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import SlugField
 
 
 class Collection(models.Model):
@@ -37,5 +35,10 @@ class Article(models.Model):
         return self.title
 
 
-class Comment(models.Model):
-    pass
+class Review(models.Model):
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, related_name="reviews"
+    )
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    date = models.DateField(auto_now_add=True)

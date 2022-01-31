@@ -1,15 +1,37 @@
-from unicodedata import category
+from dataclasses import fields
 from rest_framework import serializers
+from .models import Article, Collection, Review, Topic
 
-from news.models import Collection, Topic
+
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ["id", "title", "slug"]
 
 
-class ArticleSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    title = serializers.CharField(max_length=255)
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Topic.objects.all(), source="topic"
-    )
-    language = serializers.PrimaryKeyRelatedField(
-        queryset=Collection.objects.all(), source="collection"
-    )
+class TopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        fields = ["id", "title"]
+        collection = CollectionSerializer()
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = [
+            "id",
+            "title",
+            "description",
+            "topic",
+            "collection",
+            "created_at",
+            "is_favourite",
+            "likes",
+        ]
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "date", "name", "description", "article"]
