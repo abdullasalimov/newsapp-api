@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Collection(models.Model):
+class Region(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
 
@@ -10,19 +10,19 @@ class Collection(models.Model):
         return self.title
 
 
-class Topic(models.Model):
+class Category(models.Model):
     title = models.CharField(max_length=255)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
 
 
-class Article(models.Model):
+class News(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
-    collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_favourite = models.BooleanField(default=False)
     likes = models.ManyToManyField(User, blank=True, default=None, related_name="likes")
@@ -37,17 +37,17 @@ class Article(models.Model):
         return self.title
 
 
-class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    value = models.CharField(max_length=10)
+# class Like(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     news = models.ForeignKey(News, on_delete=models.CASCADE)
+#     value = models.CharField(max_length=10)
 
 
 class Review(models.Model):
-    new = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="reviews")
-    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateField(auto_now_add=True)
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name="reviews")
 
     def __str__(self):
-        return self.name
+        return self.title

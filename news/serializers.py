@@ -1,59 +1,60 @@
-from dataclasses import fields
 from rest_framework import serializers
-from .models import Article, Collection, Review, Topic
+from .models import News, Region, Category, Review
 
 
-class CollectionSerializer(serializers.ModelSerializer):
+class RegionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Collection
+        model = Region
         fields = ["id", "title", "slug"]
 
 
-class TopicSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
-        "collection_pk": "collection_pk",
+        "region_pk": "region_pk",
     }
 
     class Meta:
-        model = Topic
+        model = Category
         fields = ["id", "title"]
-        collection = CollectionSerializer()
+        region = RegionSerializer()
 
     def create(self, validated_data):
-        collection_id = self.context["collection_id"]
-        return Topic.objects.create(collection_id=collection_id, **validated_data)
+        region_id = self.context["region_id"]
+        return Category.objects.create(region_id=region_id, **validated_data)
 
 
-class ArticleSerializer(serializers.ModelSerializer):
+class NewsSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
-        "collection_pk": "collection_pk",
-        "topic_pk": "topic_pk",
+        "region_pk": "region_pk",
+        "category_pk": "category_pk",
     }
 
     class Meta:
-        model = Article
+        model = News
         fields = [
             "id",
-            "collection",
-            "topic",
+            "region",
+            "category",
             "title",
             "description",
             "created_at",
             "views",
-            "likes",
             "is_favourite",
+            "author",
         ]
 
+        read_only_fields = ["likes"]
+
     def create(self, validated_data):
-        topic_id = self.context["topic_id"]
-        return Article.objects.create(topic_id=topic_id, **validated_data)
+        category_id = self.context["category_id"]
+        return News.objects.create(category_id=category_id, **validated_data)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
-        "collection_pk": "collection_pk",
-        "topic_pk": "topic_pk",
-        "new_pk": "new_pk",
+        "region_pk": "region_pk",
+        "category_pk": "category_pk",
+        "news_pk": "news_pk",
     }
 
     class Meta:
@@ -61,5 +62,5 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ["id", "date", "name", "description"]
 
     def create(self, validated_data):
-        new_id = self.context["new_id"]
-        return Review.objects.create(new_id=new_id, **validated_data)
+        news_id = self.context["news_id"]
+        return Review.objects.create(news_id=news_id, **validated_data)

@@ -1,39 +1,39 @@
 from rest_framework.viewsets import ModelViewSet
-from .models import Article, Collection, Topic, Review
+from .models import News, Region, Category, Review
 from .serializers import (
-    ArticleSerializer,
-    CollectionSerializer,
+    RegionSerializer,
+    CategorySerializer,
+    NewsSerializer,
     ReviewSerializer,
-    TopicSerializer,
 )
 
 
-class CollectionViewSet(ModelViewSet):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
+class RegionViewSet(ModelViewSet):
+    queryset = Region.objects.all()
+    serializer_class = RegionSerializer
 
     def get_serializer_context(self):
         return {"request": self.request}
 
 
-class TopicViewSet(ModelViewSet):
-    serializer_class = TopicSerializer
+class CategoryViewSet(ModelViewSet):
+    serializer_class = CategorySerializer
 
     def get_queryset(self):
-        return Topic.objects.filter(collection_id=self.kwargs["collection_pk"])
+        return Category.objects.filter(region_id=self.kwargs["region_pk"])
 
     def get_serializer_context(self):
-        return {"collection_id": self.kwargs["collection_pk"]}
+        return {"region_id": self.kwargs["region_pk"]}
 
 
 class NewsViewSet(ModelViewSet):
-    serializer_class = ArticleSerializer
+    serializer_class = NewsSerializer
 
     def get_queryset(self):
-        return Article.objects.filter(topic_id=self.kwargs["topic_pk"])
+        return News.objects.filter(category_id=self.kwargs["category_pk"])
 
     def get_serializer_context(self):
-        return {"topic_id": self.kwargs["topic_pk"]}
+        return {"category_id": self.kwargs["category_pk"]}
 
     def retrieve(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -46,7 +46,7 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
-        return Review.objects.filter(new_id=self.kwargs["new_pk"])
+        return Review.objects.filter(news_id=self.kwargs["news_pk"])
 
     def get_serializer_context(self):
-        return {"new_id": self.kwargs["new_pk"]}
+        return {"news_id": self.kwargs["news_pk"]}
