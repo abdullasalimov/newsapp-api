@@ -47,6 +47,12 @@ class NewsViewSet(ModelViewSet):
                         "id": obj["id"],
                         "title": obj["title"],
                         "created_at": obj["created_at"],
+                        "description": obj["description"],
+                        "category": obj["category"],
+                        "region": obj["region"],
+                        "is_favourite": obj["is_favourite"],
+                        "author": obj["author"],
+                        "views": obj["views"],
                     }
                     for obj in response_data.data
                 ],
