@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath newsapp core.wsgi:application --log-file -
+web: gunicorn --pythonpath newsapp-api core.wsgi:application --log-file -
