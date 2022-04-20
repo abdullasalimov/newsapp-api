@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.utils import timezone
 
 
 class Region(models.Model):
@@ -25,16 +26,16 @@ class News(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_favourite = models.BooleanField(default=False)
-    likes = models.ManyToManyField(User, blank=True, default=None, related_name="likes")
+    liked_by = models.ManyToManyField(User, blank=True, default=None, related_name="liked_by")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
     views = models.IntegerField(default=0, null=True, blank=True)
 
-    @property
-    def number_of_likes(self):
-        return self.likes.all().count()
-
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        self.created_at = timezone.now()
+        super(News, self).save(*args, **kwargs)
 
 
 # class Like(models.Model):

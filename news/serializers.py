@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import News, Region, Category, Review
 
@@ -23,11 +24,22 @@ class CategorySerializer(serializers.ModelSerializer):
         return Category.objects.create(region_id=region_id, **validated_data)
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+    
+
+
 class NewsSerializer(serializers.ModelSerializer):
     parent_lookup_kwargs = {
         "region_pk": "region_pk",
         "category_pk": "category_pk",
     }
+
+    total_likes = serializers.SerializerMethodField()
+    liked_by = UserSerializer(many=True)
+
 
     class Meta:
         model = News
@@ -41,9 +53,12 @@ class NewsSerializer(serializers.ModelSerializer):
             "views",
             "is_favourite",
             "author",
+            "total_likes",
+            "liked_by",
         ]
-
-        read_only_fields = ["likes"]
+    
+    def get_total_likes(self, instance):
+        return instance.liked_by.count()
 
     # def to_representation(self, instance):
     #     return {

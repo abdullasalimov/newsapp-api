@@ -1,4 +1,4 @@
-from urllib import response
+from django.utils import timezone
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from .models import News, Region, Category, Review
@@ -40,8 +40,10 @@ class NewsViewSet(ModelViewSet):
             "status": 0,
             "message": "Success",
             "data": {
-                "updatedAt": "2020-08-31 17:49:15",
-                "serverTime": "2022-03-23 15:10:11",
+                "updatedAt": News.objects.order_by("-created_at")
+                .first()
+                .created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "serverTime": timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "news": [
                     {
                         "id": obj["id"],
@@ -53,6 +55,7 @@ class NewsViewSet(ModelViewSet):
                         "is_favourite": obj["is_favourite"],
                         "author": obj["author"],
                         "views": obj["views"],
+                        "likes": obj["total_likes"],
                     }
                     for obj in response_data.data
                 ],
